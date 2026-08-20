@@ -1,6 +1,9 @@
-<img width="722" height="1600" alt="WhatsApp Image 2026-08-15 at 6 32 31 PM (1)" src="https://github.com/user-attachments/assets/bb756935-725b-43cf-84b0-8ac0caf23f58" />
-<img width="722" height="1600" alt="WhatsApp Image 2026-08-15 at 6 32 31 PM" src="https://github.com/user-attachments/assets/eba57691-8f26-4638-b592-95df2f411870" />
-<img width="1908" height="1007" alt="Screenshot 2026-08-12 183832" src="https://github.com/user-attachments/assets/84d91d84-52f4-4a95-84bd-8d47dca9a257" />
+
+
+https://github.com/user-attachments/assets/8890dc7d-bad6-483c-b7cf-45aaf4000570
+
+<img width="1911" height="1024" alt="Screenshot 2026-08-20 154651" src="https://github.com/user-attachments/assets/fc651730-96d1-40ef-be02-2074657844d2" />
+
 # ai_chat_assistant
 
 A new Flutter project.
