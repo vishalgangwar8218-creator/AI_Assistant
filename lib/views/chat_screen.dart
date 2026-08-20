@@ -1,5 +1,6 @@
 import 'package:ai_chat_assistant/views/widgets/chat_bubble.dart';
 import 'package:ai_chat_assistant/views/widgets/input_bar.dart';
+import 'package:ai_chat_assistant/views/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/chat_viewmodel.dart';
@@ -14,6 +15,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
 
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _inputController = TextEditingController();
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -30,6 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _inputController.dispose();
     super.dispose();
   }
 
@@ -186,6 +189,7 @@ class _ChatScreenState extends State<ChatScreen> {
         Consumer<ChatViewModel>(
             builder: (context, viewModel, child) {
               return InputBar(
+                controller: _inputController  ,
                   onSendMessage: (text) {
                     viewModel.sendMessage(text, onMessageSent: () {
                       _scrollToBottom();
@@ -197,6 +201,17 @@ class _ChatScreenState extends State<ChatScreen> {
                       _scrollToBottom();
                     });
                 },
+
+                onMicPressed: () {
+                  viewModel.listen(
+                      onTextRecognized: (spokenText) {
+                        setState(() {
+                          _inputController.text = spokenText;
+                        });
+                      },
+                  );
+                },
+                isListening: viewModel.isListening,
               );
             },
         ),
@@ -223,10 +238,23 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: const Color(0xFF202123),
                     child: _buildSidebarContent(context),
                   ),
-                  // Right side chat area
                   Expanded(
-                      child: _buildChatBody(),
-                  )
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 56,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            color: const Color(0xFF343541),
+                            child: const UserAvatar(),
+                          ),
+                          // Right side chat area
+                          Expanded(
+                            child: _buildChatBody(),
+                          )
+                        ],
+                      )
+                  ),
                 ],
               ),
             );
@@ -239,6 +267,9 @@ class _ChatScreenState extends State<ChatScreen> {
               backgroundColor: const Color(0xFF202123),
               title: const Text("AI Assistant", style: TextStyle(color: Colors.white)),
               iconTheme: const IconThemeData(color: Colors.white),
+              actions: const [
+                UserAvatar(),
+              ],
             ),
             drawer: Drawer(
               backgroundColor: const Color(0xFF202123),

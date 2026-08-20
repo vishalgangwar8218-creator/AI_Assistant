@@ -3,10 +3,15 @@ import 'dart:io';
 import 'package:ai_chat_assistant/services/api_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../models/chat_model.dart';
 
 class ChatViewModel extends ChangeNotifier {
   final ApiService _apiService = ApiService();
+  final stt.SpeechToText _speech = stt.SpeechToText();
+
+  final String userId;
 
   Map<String, List<ChatModel>> _chatSessions = {};
   Map<String, String> _chatTitles = {};
@@ -15,7 +20,7 @@ class ChatViewModel extends ChangeNotifier {
   final List<String> _recentChats = [];
 
   bool _isLoading = false;
-  final String userId = "user_123";
+  bool _isListening = false;
 
   String? _currentChatId;
   String? _currentChatTitle;
@@ -23,9 +28,10 @@ class ChatViewModel extends ChangeNotifier {
   List<ChatModel> get messages => _messages;
   List<String> get recentChats => _recentChats;
   bool get isLoading => _isLoading;
+  bool get isListening => _isListening;
   String? get currentChatTitle => _currentChatTitle;
 
-  ChatViewModel() {
+  ChatViewModel({required this.userId}) {
     fetchHistory();
   }
 
@@ -83,6 +89,40 @@ class ChatViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Speech to Text: Bolne par text input box mein type karne ke liye
+  Future<void> listen({required Function(String) onTextRecognized}) async {
+    if(_isLoading) return;
+
+    if(!_isListening) {
+      bool available = await _speech.initialize(
+        onStatus: (status) {
+          if (status == 'notListening' || status == 'done') {
+            _isListening = false;
+            notifyListeners();
+          }
+        },
+        onError: (error) {
+          _isListening = false;
+          notifyListeners();
+        },
+      );
+
+      if(available) {
+        _isListening = true;
+        notifyListeners();
+        _speech.listen(
+          onResult: (result) {
+            onTextRecognized(result.recognizedWords);
+          },
+        );
+      }
+    } else {
+      _isListening = false;
+      _speech.stop();
+      notifyListeners();
+    }
+  }
+
   Future<void> pickAndSendFile({Function? onMessageSent}) async {
     if(_isLoading) return;
 
@@ -109,8 +149,8 @@ class ChatViewModel extends ChangeNotifier {
         if (onMessageSent != null) onMessageSent();
 
         // Spring Boot backend par file aur message bhejna
-        var response = await _apiService.sendChatMessage
-          (userId,
+        var response = await _apiService.sendChatMessage(
+            userId,
             "Please analyze this attached file.",
             _currentChatId,
             file: file

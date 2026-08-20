@@ -1,0 +1,1 @@
+ D:\\ai_chat_assistant\\.dart_tool\\flutter_build\\aea13b9d89acf283f9c00e9be1880004\\dart_build_result.json:  D:\\ai_chat_assistant\\.dart_tool\\package_config.json D:\\ai_chat_assistant\\pubspec.yaml D:\\flutter_windows_3.44.6-stable\\flutter\\bin\\cache\\dart-sdk\\version d:\\ai_chat_assistant\\.dart_tool\\package_config.json

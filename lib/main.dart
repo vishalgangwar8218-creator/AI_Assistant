@@ -1,4 +1,6 @@
+import 'package:ai_chat_assistant/viewmodels/auth_viewmodel.dart';
 import 'package:ai_chat_assistant/viewmodels/chat_viewmodel.dart';
+import 'package:ai_chat_assistant/views/auth_screen.dart';
 import 'package:ai_chat_assistant/views/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,14 +15,27 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ChatViewModel(),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthViewmodel()),
+          ChangeNotifierProxyProvider<AuthViewmodel, ChatViewModel>(
+              create: (context) => ChatViewModel(userId: Provider.of<AuthViewmodel>(context, listen: false).userId),
+              update: (context, auth, previousChatViewModel) => ChatViewModel(userId: auth.userId),
+          ),
+        ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "AI Chat Assistant",
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const ChatScreen(),
-      )
+        home: Consumer<AuthViewmodel>(
+            builder: (context, auth, child) {
+              if(!auth.isLoggedIn) {
+                return const AuthScreen();
+              }
+              return const ChatScreen();
+            },
+        ),
+      ),
     );
   }
 }

@@ -4,12 +4,18 @@ class InputBar extends StatefulWidget {
   final Function(String) onSendMessage;
   final bool isLoading;
   final VoidCallback? onAttachedPressed;
+  final VoidCallback onMicPressed;
+  final bool isListening;
+  final TextEditingController? controller;
 
   const InputBar({
     super.key,
     required this.onSendMessage,
     required this.isLoading,
-    this.onAttachedPressed
+    required this.isListening,
+    required this.onMicPressed,
+    this.onAttachedPressed,
+    this.controller,
   });
 
   @override
@@ -17,7 +23,13 @@ class InputBar extends StatefulWidget {
 }
 
 class _InputBarState extends State<InputBar> {
-  final TextEditingController textController = TextEditingController();
+  late final TextEditingController textController;
+
+  @override
+  void initState() {
+    super.initState();
+    textController = widget.controller ?? TextEditingController();
+  }
 
   void _handleSend() {
     final text = textController.text.trim();
@@ -25,12 +37,6 @@ class _InputBarState extends State<InputBar> {
 
     textController.clear();
     widget.onSendMessage(text);
-  }
-
-  @override
-  void dispose() {
-    textController.dispose();
-    super.dispose();
   }
 
   @override
@@ -82,7 +88,7 @@ class _InputBarState extends State<InputBar> {
                 minLines: 1,
                 textInputAction: TextInputAction.send,
                 decoration: InputDecoration(
-                  hintText: widget.isLoading ? "AI is thinking..." : "Message AI Assistant...",
+                  hintText: widget.isLoading ? "Listening..." : (widget.isLoading ? "AI is thinking..." : "Message AI Assistant..."),
                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 15),
                   border: InputBorder.none,
                   isDense: true,
@@ -91,6 +97,26 @@ class _InputBarState extends State<InputBar> {
                 onSubmitted: (value) {
                   _handleSend();
                 },
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // MIC BUTTON
+            GestureDetector(
+              onTap: widget.isLoading ? null : widget.onMicPressed,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: widget.isListening
+                      ? Colors.red.withOpacity(0.2)
+                      : Colors.white.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  widget.isListening ? Icons.mic : Icons.mic_none,
+                  color: widget.isListening ? Colors.redAccent : Colors.white70,
+                  size: 18,
+                ),
               ),
             ),
             const SizedBox(width: 8),

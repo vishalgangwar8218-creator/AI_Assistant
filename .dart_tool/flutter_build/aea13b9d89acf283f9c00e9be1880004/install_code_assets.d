@@ -1,0 +1,1 @@
+ D:\\ai_chat_assistant\\.dart_tool\\flutter_build\\aea13b9d89acf283f9c00e9be1880004\\native_assets.json: 
